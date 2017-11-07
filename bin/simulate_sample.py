@@ -4,19 +4,18 @@
 """
 
 from __future__ import division
+from sys import argv, exit
 from collections import defaultdict
 import argparse
 import csv
 import math
 from Bio import SeqIO
-from random import choices
 from numpy import random
 
 __author__ = "Luisa W Hugerth"
 __email__ = "luisa.hugerth@scilifelab.se"
 
 
-		
 def parse_taxonomy(composition, minimum, factor):
 	taxcounts = dict()
 	with open (composition) as csvfile:
@@ -102,6 +101,10 @@ if __name__ == '__main__':
 	parser.add_argument('-m', '--minimum', type=int, nargs='?', const=0, help="Minimal number of genomes per taxon, default 0")
 	parser.add_argument('-f', '--factor', type=int, nargs='?', const=1, help="Integer to divide taxon counts by, limiting the number of genomes, default 1")
 	parser.add_argument('--noplasmid', type=bool, nargs='?', const=False, help="Whether plasmids in the genome DB may be included as genomes, default False")
+	if len(argv) < 2:
+		parser.print_help()
+		exit(1)
+	
 	args = parser.parse_args()
 	
 	main(args.composition, args.taxonomy, args.genomes, args.minimum, args.factor, args.noplasmid)
