@@ -29,12 +29,13 @@ clean_type_name=${sample_type_basename%%_*}
 randomreads.sh \
 	build=$db_build_no \
 	ref=$path_to_genomes_fasta \
-	out=${clean_type_name}_50M.fastq.gz \
+	out=${clean_type_name}_50M_#.fastq.gz \
 	snprate=$snprate \
 	insrate=$insrate \
 	delrate=$delrate \
 	subrate=$subrate \
 	length=$length \
+	paired=true \
 	reads=$reads 
 
 fastqc ${clean_type_name}_50M.fastq.gz 
