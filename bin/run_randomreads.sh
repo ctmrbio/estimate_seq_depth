@@ -38,4 +38,5 @@ randomreads.sh \
 	paired=true \
 	reads=$reads 
 
-fastqc ${clean_type_name}_50M.fastq.gz 
+fastqc ${clean_type_name}_50M_1.fastq.gz 
+fastqc ${clean_type_name}_50M_2.fastq.gz 
