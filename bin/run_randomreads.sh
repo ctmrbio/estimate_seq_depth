@@ -2,10 +2,22 @@
 # Script to generate simulated metagenomes for different sample types
 # Fredrik Boulund and Luisa Hugerth 2017
 
+# "Unofficial Bash strict mode"
+set -euo pipefail
+IFS=$'\n\t'
+
 # Define input arguments
 if [ $# -eq 0 ]; then
-	echo "Usage: script.sh path/to/genomes.fasta N"
-	echo "where N is a unique BBMap build number for the index of genomes.fasta."
+	echo "usage: script.sh FASTA N"
+	echo ""
+	echo "  FASTA   path to a single FASTA file with reference"
+	echo "          genome sequences. The file basename is split on"
+	echo '          the underscore character (_) to produce the basename'
+	echo "          for the output filenames, e.g. 'biopsies_m1_f500.fasta'"
+	echo "          produces output files 'biopsies_50M_{1,2}.fastq.gz'."
+	echo '  N       a unique BBMap database build number (int) for'
+	echo "          the BBMap index of genomes.fasta."
+	echo ""
 	echo "The script is designed to be easy to run with GNU parallel, e.g.:"
 	echo "parallel './run_randomreads.sh {} {#}' ::: ../type1/type1_m1_f500.fasta ../type2/type2_m1_f500.fasta"
 	exit 1
