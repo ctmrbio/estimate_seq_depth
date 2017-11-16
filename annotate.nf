@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 // vim: syntax=groovy expandtab
 /****************************************
- * Annotate reference contigs using TIGRFAM
+ * Annotate raw reads using TIGRFAM
  * and Pfam models.
  * Copyright (c) Authors 2017 
  * Authors:
@@ -11,11 +11,9 @@
 
 Channel
     .fromFilePairs(params.input_reads)
-    .ifEmpty{ exit 1, "Found no input contigs, did you specify --input_reads? I got: '${params.input_reads}'"}
+    .ifEmpty{ exit 1, "Found no input read pairs, did you specify --input_reads? I got: '${params.input_reads}'"}
     .into {input_reads_tigrfam;
            input_reads_pfam}
-
-params.tigrfams_lib = '/home/ctmr/db/TIGRFAMs/latest/LIB/TIGRFAMs_15.0_HMM.LIB'
 
 
 /****************************************
