@@ -29,9 +29,9 @@ process hmmsearch_tigrfam {
     set pair_id, file(reads) from input_reads_tigrfam
 
     output:
-    set pair_id, "${pair_id}.domtbl.txt" into input_tigrfam_annotations
     file "${pair_id}.tbl.txt"
     file "${pair_id}.hmmsearch.stdout"
+    file "${pair_id}.tigrfam_counts.tsv"
 
     script:
     """
@@ -44,31 +44,13 @@ process hmmsearch_tigrfam {
         --cpu ${task.cpus} \
         --seed 1337 \
         --tblout ${pair_id}.tbl.txt \
-        --domtblout ${pair_id}.domtbl.txt \
         ${params.tigrfams_lib} \
         ${pair_id}_6translated.fa \
-        > ${pair_id}.hmmsearch.stdout
-    """
-} 
-
-process parse_annotations {
-    tag {pair_id}
-    publishDir "${params.outdir}/tigrfam_annotations", mode: 'move'
-
-    input:
-    set pair_id, file(domain_table) from input_tigrfam_annotations
-
-    output:
-    file "${pair_id}.tigrfam_counts.tsv"
-
-    script:
-    """
+        > ${pair_id}.hmmsearch.stdout \
+    && \
     count_tigrfam_annotations.py \
-        --tbl ${domain_table} \
+        --tbl ${pair_id}.tbl.txt \
         --cutoffs ${params.tigrfam_cutoffs} \
         --output ${pair_id}.tigrfam_counts.tsv
     """
-}
-
-
-
+} 

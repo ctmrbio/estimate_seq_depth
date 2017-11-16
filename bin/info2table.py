@@ -1,1 +1,0 @@
-../libs/TIGRFAM_scripts/info2table.py
