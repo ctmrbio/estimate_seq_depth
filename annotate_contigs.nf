@@ -32,7 +32,7 @@ process assemble {
         -1 ${reads[0]} \
         -2 ${reads[1]} \
         -o megahit_out
-    mv megahit_out/final.contigs.fasta ${pair_id}.contigs.fasta
+    mv megahit_out/final.contigs.fa ${pair_id}.contigs.fasta
     """
 }
 
