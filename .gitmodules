@@ -1,3 +1,6 @@
 [submodule "libs/TIGRFAM_scripts"]
 	path = libs/TIGRFAM_scripts
 	url = https://github.com/boulund/TIGRFAM_scripts.git
+[submodule "libs/measures"]
+	path = libs/measures
+	url = git@github.com:boulund/measures.git
