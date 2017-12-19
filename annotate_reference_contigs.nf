@@ -2,7 +2,6 @@
 // vim: syntax=groovy expandtab
 /****************************************
  * Annotate reference contigs using TIGRFAM
- * and Pfam models.
  * Copyright (c) Authors 2017 
  * Authors:
  *  Fredrik Boulund <fredrik.boulund@ki.se>
