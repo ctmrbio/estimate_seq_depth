@@ -18,7 +18,7 @@ Channel
  ****************************************/
 process assemble {
     tag {pair_id}
-    publishDir "${params.outdir}/assembled_contigs", mode: 'move'
+    publishDir "${params.outdir}/assembled_contigs", mode: 'copy'
 
     input:
     set pair_id, file(reads) from input_reads_megahit
@@ -42,7 +42,7 @@ process assemble {
  ****************************************/
 process orf_prediction {
     tag {file_id}
-    publishDir "${params.outdir}/metagenemark", mode: 'copy'
+    publishDir "${params.outdir}/metagenemark_contigs", mode: 'copy'
 
     input:
     set file_id, file(contigs) from input_contigs_mgm
@@ -67,7 +67,7 @@ process orf_prediction {
 
 process hmmsearch_tigrfam {
     tag {file_id}
-    publishDir "${params.outdir}/hmmsearch_tigrfam", mode: 'copy'
+    publishDir "${params.outdir}/hmmsearch_tigrfam_contigs", mode: 'copy'
 
     input:
     set file_id, file(proteins) from input_proteins_tigrfam
