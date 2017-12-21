@@ -25,7 +25,7 @@ process assemble {
     set pair_id, file(reads) from input_reads_megahit
 
     output:
-    set pair_id, file("${pair_id}.contigs.fasta") into input_contigs_mgm, input_contigs_map
+    set pair_id, file("${pair_id}.contigs.fasta") into input_contigs_mgm
 
     script:
     """
@@ -35,30 +35,6 @@ process assemble {
         -o megahit_out
     mv megahit_out/final.contigs.fa ${pair_id}.contigs.fasta
     """
-}
-
-process map_reads_to_assembly {
-    tag {pair_id}
-    publishDir "${params.outdir}/assembled_contigs", mode: 'copy'
-
-    input:
-    set pair_id, file(reads) from input_reads_map
-    set pair_id, file(contigs) from input_contigs_map
-
-    output:
-    file "${pair_id}.mapped_reads.sam.gz" 
-
-    script:
-    """
-    echo ${reads} ${contigs}
-    bbmap.sh \
-        in1=${reads[0]} \
-        in2=${reads[1]} \
-        ref=${contigs} \
-        out=${pair_id}.mapped_reads.sam.gz \
-        nodisk=t \
-    """
-
 }
 
 
@@ -74,7 +50,7 @@ process orf_prediction {
 
     output:
     set file_id, file("${file_id}.predicted_proteins.fasta") into input_proteins_tigrfam
-    file "${file_id}.predicted_nucleotides.fasta"
+    file "${file_id}.predicted_nucleotides.fasta" into orf_nucleotides
     file "${file_id}.gmhmmp.lst"
 
     script:
@@ -90,6 +66,33 @@ process orf_prediction {
 }
 
 
+process map_reads_to_orfs {
+    tag {pair_id}
+    publishDir "${params.outdir}/metagenemark_contigs", mode: 'copy'
+
+    input:
+    set pair_id, file(reads) from input_reads_map
+    set pair_id, file(orfs) from orf_nucleotides
+
+    output:
+    file "${pair_id}.mapped_reads.sam.gz" 
+    file "${pair_id}.covstats.txt" 
+    file "${pair_id}.rpkm.txt" 
+
+    script:
+    """
+    bbmap.sh \
+        in1=${reads[0]} \
+        in2=${reads[1]} \
+        ref=${orfs} \
+        nodisk=t \
+        out=${pair_id}.mapped_reads.sam.gz \
+        covstats=${pair_id}.covstats.txt \
+        rpkm=${pair_id}.rpkm.txt \
+    """
+}
+
+
 process hmmsearch_tigrfam {
     tag {file_id}
     publishDir "${params.outdir}/hmmsearch_tigrfam_contigs", mode: 'copy'
@@ -100,7 +103,6 @@ process hmmsearch_tigrfam {
     output:
     file "${file_id}.tbl.txt"
     file "${file_id}.hmmsearch.stdout"
-    file "${file_id}.tigrfam_counts.tsv"
 
     script:
     """
@@ -111,10 +113,7 @@ process hmmsearch_tigrfam {
         ${params.tigrfams_lib} \
         ${proteins} \
         > ${file_id}.hmmsearch.stdout \
-    && \
-    count_tigrfam_annotations.py \
-        --tbl ${file_id}.tbl.txt \
-        --cutoffs ${params.tigrfam_cutoffs} \
-        --output ${file_id}.tigrfam_counts.tsv
     """
 } 
+
+
