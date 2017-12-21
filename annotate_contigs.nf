@@ -11,7 +11,8 @@
 Channel
     .fromFilePairs(params.input_reads)
     .ifEmpty{ exit 1, "Found no input read pairs, did you specify --input_reads? I got: '${params.input_reads}'"}
-    .set{input_reads_megahit}
+    .into {input_reads_megahit;
+           input_reads_map}
 
 /****************************************
  *                ASSEMBLY
@@ -24,7 +25,7 @@ process assemble {
     set pair_id, file(reads) from input_reads_megahit
 
     output:
-    set pair_id, file("${pair_id}.contigs.fasta") into input_contigs_mgm
+    set pair_id, file("${pair_id}.contigs.fasta") into input_contigs_mgm, input_contigs_map
 
     script:
     """
@@ -34,6 +35,30 @@ process assemble {
         -o megahit_out
     mv megahit_out/final.contigs.fa ${pair_id}.contigs.fasta
     """
+}
+
+process map_reads_to_assembly {
+    tag {pair_id}
+    publishDir "${params.outdir}/assembled_contigs", mode: 'copy'
+
+    input:
+    set pair_id, file(reads) from input_reads_map
+    set pair_id, file(contigs) from input_contigs_map
+
+    output:
+    file "${pair_id}.mapped_reads.sam.gz" 
+
+    script:
+    """
+    echo ${reads} ${contigs}
+    bbmap.sh \
+        in1=${reads[0]} \
+        in2=${reads[1]} \
+        ref=${contigs} \
+        out=${pair_id}.mapped_reads.sam.gz \
+        nodisk=t \
+    """
+
 }
 
 
