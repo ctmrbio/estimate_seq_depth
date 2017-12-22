@@ -50,7 +50,7 @@ process orf_prediction {
 
     output:
     set file_id, file("${file_id}.predicted_proteins.fasta") into input_proteins_tigrfam
-    file "${file_id}.predicted_nucleotides.fasta" into orf_nucleotides
+    set file_id, file("${file_id}.predicted_nucleotides.fasta") into orf_nucleotides
     file "${file_id}.gmhmmp.lst"
 
     script:
