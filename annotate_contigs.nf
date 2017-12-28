@@ -14,9 +14,7 @@ Channel
     .into {input_reads_megahit;
            input_reads_map}
 
-/****************************************
- *                ASSEMBLY
- ****************************************/
+
 process assemble {
     tag {pair_id}
     publishDir "${params.outdir}/assembled_contigs", mode: 'copy'
@@ -38,9 +36,6 @@ process assemble {
 }
 
 
-/****************************************
- *                TIGRFAMs
- ****************************************/
 process orf_prediction {
     tag {file_id}
     publishDir "${params.outdir}/metagenemark_contigs", mode: 'copy'
@@ -66,13 +61,19 @@ process orf_prediction {
 }
 
 
+// Match up predicted orfs with the correct set of reads
+// by grouping the two channels on their pair_id (position 0 in the tuple)
+orf_nucleotides
+    .combine(input_reads_map, by: 0) 
+    .set {input_orfs_reads}
+
+
 process map_reads_to_orfs {
     tag {pair_id}
     publishDir "${params.outdir}/metagenemark_contigs", mode: 'copy'
 
     input:
-    set pair_id, file(reads) from input_reads_map
-    set pair_id, file(orfs) from orf_nucleotides
+    set pair_id, file(orfs), file(reads) from input_orfs_reads
 
     output:
     file "${pair_id}.mapped_reads.sam.gz" 
